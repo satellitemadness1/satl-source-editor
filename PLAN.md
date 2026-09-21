@@ -9,11 +9,23 @@ Last updated: 2026-09-20.
 
 ## 1. The Satellite language — PRESERVE THIS SECTION
 
-**This is the only written record of the syntax that exists.** The user
-stated there is no other source except on another machine, and no website
-yet (it would be `satellite.foundation`, but there is nothing there).
-Everything below came directly from them. Do not "correct" or invent syntax.
-Ask before extending it.
+**Corrected 2026-09-20: this is NOT the only record.** It was written when
+the user said the syntax existed nowhere else, and that was wrong — they had
+forgotten. The canonical sources are:
+
+- **<https://github.com/satellitemadness1/satellite>** — "The Satellite
+  Programming Language For Ubuntu/Linux", C++, the actual implementation.
+- **<https://satellite.foundation>** — live (HTTP 200), where the earlier
+  note said there was nothing.
+
+Everything below came directly from the user by dictation and **has never
+been reconciled against either source**. Treat it as notes, not as the
+specification: where it disagrees with the implementation, the
+implementation wins. It is still worth keeping, because it records what the
+user asked the editor to support and in their own words.
+
+Do not invent or extend syntax. Check the repository above first, and ask
+the user when it is still unclear.
 
 Source files use the extension **`.satl`**.
 
@@ -447,7 +459,8 @@ threads. Ask the user to run the editor through it and read that file
 first. Delete the script once the freeze is understood.
 
 1. **`data/satellite.lang`** — a GtkSourceView 5 language definition, the
-   original goal. Needs: the `satellite.` prefix, the namespaces in §1,
+   original goal. **Read <https://github.com/satellitemadness1/satellite>
+   first**: the real grammar is there, and §1 below is only dictated notes. Needs: the `satellite.` prefix, the namespaces in §1,
    `//` comments, strings, numbers, user identifiers left unstyled. Register
    the directory with `gtk_source_language_manager_set_search_path()` and set
    it on the buffer. Glob: `*.satl`.
