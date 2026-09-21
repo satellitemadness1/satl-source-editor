@@ -27,6 +27,67 @@ user asked the editor to support and in their own words.
 Do not invent or extend syntax. Check the repository above first, and ask
 the user when it is still unclear.
 
+### Verified against the canonical repo, 2026-09-20
+
+Fetched from `satellitemadness1/satellite@main`. Everything in this
+subsection is **real Satellite**, copied from programs that ship with the
+implementation — unlike the dictated notes that follow it.
+
+The organising rule, in the language author's own words (README.md):
+
+> a dotted path rooted at `satellite` names something the language owns, and
+> a bare identifier names something the user owns.
+
+**That single sentence is the whole design of the highlighter.** Style the
+dotted `satellite.…` paths; leave bare identifiers alone.
+
+`examples/hello_world.satl`, verbatim:
+
+```satellite
+// satellite-004's first program
+
+satellite.include(satellite)
+
+satellite.capsule satellite.main(satellite.container.list<satellite.variable.string> arguments)
+{
+    satellite.console.display("Hello, World!")
+    satellite.console.display("a // inside a string is not a comment") // this one is
+    satellite.console.display(42)
+    satellite.console.display(satellite.bool.true)
+
+    satellite.return(satellite)
+}
+```
+
+What that adds to the dictated notes below:
+
+| fact | evidence |
+|---|---|
+| `satellite.bool.true` — booleans are a dotted path too | `hello_world.satl` |
+| bare integer literals: `42` | `hello_world.satl` |
+| integers are arbitrarily large: `99999999999999999999999` | `tests/big_number.satl` |
+| **a `//` inside a string is not a comment** | `hello_world.satl`, deliberately |
+| `"some" + "str"` — `+` concatenates | `tests/two_strings.satl` |
+| `satellite.variable.string s = "not yet"` | `tests/not_understood.satl` |
+
+The last row matters: the dictated note below shows
+`satellite.variable.string my_number = 9` and warns not to infer type rules
+from it. The real test file assigns a *string* to a string, so that example
+was probably misremembered. **Do not design anything around it.**
+
+The `//`-inside-a-string line is a direct instruction to whoever writes
+`satellite.lang`: strings must be matched **before** comments, or the
+language's own hello-world highlights wrongly. It is in their example on
+purpose.
+
+Still **unverified** — dictated only, and absent from every program in the
+repo: the threading API (`satellite.thread.new`, `.start()`, `.join()`,
+`.stop()`), the `satellite.statement.*` keywords, `switch`/`case`, and the
+`file` / `infinity` / `window` variable types. Ask, or read the
+implementation, before relying on them.
+
+### The dictated notes
+
 Source files use the extension **`.satl`**.
 
 Nearly every token is prefixed `satellite.` — the exceptions are identifiers
@@ -520,8 +581,11 @@ the user says to drop it — it cost nothing and it is already written.
 - **Should double-clicking a directory row navigate into it?** Still
   unanswered, and now more visible: files respond to a double click and
   directories sit there. The row already carries everything needed.
-- Project `license` in `meson.build` is set to **MIT**, which the assistant
-  chose arbitrarily. The user has never stated a license.
+- ~~Project `license` in `meson.build` is set to MIT, chosen arbitrarily.~~
+  **Settled 2026-09-20**: the Satellite repo ships `LICENSE` reading "MIT
+  License (Expat), Copyright (c) 2026 Terran Satellite", so MIT matches
+  what the user already chose for the language itself. Worth confirming
+  they want the same copyright line here.
 - Closing the last tab opens a fresh `Untitled1.txt`, on the grounds that an
   empty notebook is a hole in the window. Leave it empty instead?
 - `Untitled` numbering reuses the lowest free number, so closing
