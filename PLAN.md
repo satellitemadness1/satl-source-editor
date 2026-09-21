@@ -420,14 +420,28 @@ visual confirmation is not available; assert on widget state instead
 
 ## 6. Next up
 
-### 0. UNRESOLVED: the user reports the app freezing at startup
+### 0. CLOSED as not reproducible: a startup freeze, reported once
 
-**This is the open issue. It is not fixed, and it was never reproduced.**
+**Status: the user could not reproduce it afterwards and considers it gone.
+It was never diagnosed.** Kept here because "cannot reproduce" is not the
+same as "understood", and if it comes back this is the head start.
 
 On 2026-09-20 the user reported that the app "freezes now", answering: it
 happens **right at startup**, without touching anything, and it appears as
 GNOME's **"app is not responding — force quit / wait?"**. That dialog means
-the GTK thread is not answering the compositor's ping.
+the GTK thread is not answering the compositor's ping. By the end of the
+same session they reported it no longer happening.
+
+Three explanations fit, and they were never told apart:
+
+1. one of the hangs fixed that session covered it — the GTK-thread join on
+   tab close, the FIFO that stopped the scanner for good, or `post()`
+   running closures inline at shutdown (all in the review table below);
+2. it was transient;
+3. **they were watching one of the assistant's test windows.** Roughly
+   thirty maximized instances were launched on their screen that session,
+   several killed mid-startup by `timeout`, every one identical to their
+   own. This costs nothing to believe and explains the symptom exactly.
 
 What was ruled out, by measurement, on this machine:
 
@@ -450,13 +464,14 @@ that stopped the scanner for good, `post()` running closures inline at
 shutdown. **None of them fires at startup with nothing touched**, so none of
 them can be claimed as the user's bug.
 
-**`./debug-freeze.sh` is waiting in the project root for the next report.**
+**If it returns, `./debug-freeze.sh` is in the project root.**
 It launches the editor, probes it from outside every 3 seconds, and on two
 consecutive misses writes `freeze-report.txt` with every thread's `wchan`
 and a full `gdb` backtrace of all threads. Its capture path was tested by
 freezing the app deliberately with SIGSTOP: it caught it and dumped all 19
 threads. Ask the user to run the editor through it and read that file
-first. Delete the script once the freeze is understood.
+first. Keep the script until the freeze is actually understood, or until
+the user says to drop it — it cost nothing and it is already written.
 
 1. **`data/satellite.lang`** — a GtkSourceView 5 language definition, the
    original goal. **Read <https://github.com/satellitemadness1/satellite>
