@@ -80,11 +80,66 @@ The `//`-inside-a-string line is a direct instruction to whoever writes
 language's own hello-world highlights wrongly. It is in their example on
 purpose.
 
-Still **unverified** — dictated only, and absent from every program in the
-repo: the threading API (`satellite.thread.new`, `.start()`, `.join()`,
-`.stop()`), the `satellite.statement.*` keywords, `switch`/`case`, and the
-`file` / `infinity` / `window` variable types. Ask, or read the
-implementation, before relying on them.
+### The authoritative word registry
+
+`old_versions/second_satellite/` holds a complete front-end — lexer, parser,
+AST — from the previous interpreter. The current top level is *satellite 004
+revision 02*, a rewrite in progress with no lexer in it yet, so **the old
+version is the best enumeration of the language that exists**, with the
+caveat that 004 may change it.
+
+The registry is one X-macro file:
+
+    old_versions/second_satellite/src/satellite_words/words.def
+
+371 `SAT_NODE(parent, ident, text, kind)` rows, plus `SAT_BUILT` and
+`SAT_ALIAS`. Its own header says `WORD_NUMBERS.md` is the authority and it
+is the copy a compiler can check. Reconstruct the dotted paths with:
+
+```bash
+curl -s https://raw.githubusercontent.com/satellitemadness1/satellite/main/\
+old_versions/second_satellite/src/satellite_words/words.def |
+python3 -c "
+import re,sys
+src=sys.stdin.read()
+rows=re.findall(r'SAT_NODE\(\s*(\w+)\s*,\s*(\w+)\s*,\s*\"((?:[^\"\\\\]|\\\\.)*)\"', src)
+par={i:p for p,i,t in rows}; txt={i:t for p,i,t in rows}
+def path(i):
+    out=[]
+    while i in par: out.append(txt[i]); i=par[i]
+    return '.'.join(reversed(out))
+print('\n'.join(sorted({path(i) for i in par})))
+"
+```
+
+That yields **313 dotted names** under 25 top-level namespaces:
+
+| namespace | names | namespace | names |
+|---|---|---|---|
+| `satellite.variable` | 99 | `satellite.directory` | 6 |
+| `satellite.container` | 51 | `satellite.file` | 6 |
+| `satellite.library` | 50 | `satellite.statement` | 5 |
+| `satellite.system` | 34 | `satellite.time` | 5 |
+| `satellite.random` | 17 | `satellite.window` | 4 |
+| `satellite.console` | 10 | `satellite.bool` | 3 |
+| `satellite.network` | 8 | `satellite.capsule` | 2 |
+| `satellite.thread` | 2 | | |
+
+and singletons: `analyze`, `constructor`, `help`, `include`, `main`,
+`protected`, `public`, `return`, `returns`, `spacesuit`.
+
+**Where the dictated notes are WRONG.** The registry contradicts them:
+
+| dictated below | what the registry has |
+|---|---|
+| `satellite.statement.finally`, `.switch`, `.case` | **absent.** Only `if`, `else`, `for`, `while` |
+| `satellite.variable.infinity` | **absent.** The types are binary, bool, capsule, date, duration, expression, file, float, hex, network, number, string, thread, time, variant, window |
+| `my_thread.stop()` | **absent.** Only `.start()` and `.join()` on `satellite.variable.thread` |
+| containers are `list` | also `map`, `arguments`, `result` |
+
+Treat the dictated notes as a record of what the user *said*, and the
+registry as what the language *has*. Where they differ, ask — the user may
+be describing 004's intended direction rather than misremembering.
 
 ### The dictated notes
 
